@@ -3,7 +3,9 @@ let tasks = []
 function renderEditor() {
     let inputEl = document.querySelector("#default-todo-panel .todo-editor > input")
     let addTask = () => {
-
+        if (inputEl.value.length == 0) {
+            return;
+        }
         let newTask = {
             title: inputEl.value,
             done: false,
@@ -12,7 +14,7 @@ function renderEditor() {
         inputEl.value = ""
 
 
-        renderTaskItenms();
+        renderTaskItems();
     }
 
     inputEl.onkeypress = (e) => {
@@ -27,31 +29,82 @@ function renderEditor() {
     }
 }
 
-function renderTaskItenms() {
+function renderTaskItems() {
     let itemsEl = document.querySelector("#default-todo-panel .todo-items");
     itemsEl.querySelectorAll('div').forEach((Node) => Node.remove())
     for (let i = 0; i < tasks.length; i++) {
         let task = tasks[i]
         let itemEl = document.createElement('div')
+        itemEl.className = 'task'
 
         let doneEl = document.createElement('input')
         doneEl.type = 'checkbox'
+        doneEl.checked = task.done
+        if (task.done) {
+            itemEl.classList.add('done')
+
+        } else {
+            itemEl.classList.remove('done')
+        }
+
+        doneEl.onchange = (e) => {
+            task.done = e.target.checked
+            if (task.done) {
+                itemEl.classList.add('done')
+
+            } else {
+                itemEl.classList.remove('done')
+            }
+        }
         itemEl.append(doneEl)
 
         let titleEl = document.createElement('label')
         titleEl.innerText = task.title
         itemEl.append(titleEl)
 
-        let cancelEl = document.createElement('button')
-        cancelEl.innerText = "×";
-        cancelEl.onclick = () => {
-            tasks.splice(i, 1);
-            renderTaskItenms()
-        }
-        itemEl.append(cancelEl)
+
+        let ctrlbarEl = renderTaskCtrlbar(tasks, i)
+
+        itemEl.append(ctrlbarEl)
 
         itemsEl.append(itemEl)
     }
 }
+
+function renderTaskCtrlbar(tasks, taskIdx) {
+    let ctrlbarEl = document.createElement('div')
+    ctrlbarEl.className = "ctrlbar"
+
+
+    let upEl = document.createElement('button')
+    if (taskIdx === 0) {
+        upEl.disabled = true;
+    }
+    upEl.innerText = "⬆";
+    upEl.onclick = () => {
+
+
+
+    }
+    ctrlbarEl.append(upEl)
+
+    let downEl = document.createElement('button')
+    downEl.innerText = "⬇";
+    downEl.onclick = () => {
+
+    }
+    ctrlbarEl.append(downEl)
+
+    let cancelEl = document.createElement('button')
+    cancelEl.innerText = "×";
+    cancelEl.onclick = () => {
+        tasks.splice(taskIdx, 1);
+        renderTaskItems()
+    }
+
+    ctrlbarEl.append(cancelEl)
+
+    return ctrlbarEl;
+}
 renderEditor()
-renderTaskItenms()
+renderTaskItems()
