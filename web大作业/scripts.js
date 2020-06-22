@@ -1,4 +1,5 @@
 let tasks = []
+let importitems = 0;
 
 function renderEditor() {
     let inputEl = document.querySelector("#default-todo-panel .todo-editor > input")
@@ -39,6 +40,8 @@ function renderTaskItems() {
 
         let doneEl = document.createElement('input')
         doneEl.type = 'checkbox'
+
+        //事件完成
         doneEl.checked = task.done
         if (task.done) {
             itemEl.classList.add('done')
@@ -63,7 +66,7 @@ function renderTaskItems() {
         itemEl.append(titleEl)
 
 
-        let ctrlbarEl = renderTaskCtrlbar(tasks, i)
+        let ctrlbarEl = renderTaskCtrlbar(task, itemEl, i)
 
         itemEl.append(ctrlbarEl)
 
@@ -71,18 +74,54 @@ function renderTaskItems() {
     }
 }
 
-function renderTaskCtrlbar(tasks, taskIdx) {
+function renderTaskCtrlbar(task, itemEl, taskIdx) {
     let ctrlbarEl = document.createElement('div')
     ctrlbarEl.className = "ctrlbar"
 
+    let impEl = document.createElement('input');
+    impEl.type = 'checkbox'
+    impEl.checked = task.import;
+    if (task.import) {
+        itemEl.classList.add('import')
+    } else {
+        itemEl.classList.remove('import')
+    }
+    impEl.onchange = (e) => {
+        task.import = e.target.checked;
+        if (task.import) {
+            itemEl.classList.add("import");
+            let t = task;
+            for (let j = taskIdx; j > 0; j--) {
+                tasks[j] = tasks[j - 1];
+            }
+            tasks[0] = t;
+            importitems++;
+        } else {
+            itemEl.classList.remove("import");
+            let t = task;
+            for (let j = taskIdx; j < tasks.length - 1; j++) {
+                tasks[j] = tasks[j + 1];
+            }
+            tasks[tasks.length - 1] = t;
+            importitems--;
+        }
+        renderTaskItems();
+
+    }
+
+    ctrlbarEl.append(impEl);
+
 
     let upEl = document.createElement('button')
-    if (taskIdx === 0) {
+    if (taskIdx === 0 || taskIdx === importitems) {
         upEl.disabled = true;
     }
     upEl.innerText = "⬆";
     upEl.onclick = () => {
-
+        let t = tasks[taskIdx];
+        tasks[taskIdx] = tasks[taskIdx - 1];
+        tasks[taskIdx - 1] = t;
+        renderTaskItems();
 
 
     }
@@ -90,7 +129,14 @@ function renderTaskCtrlbar(tasks, taskIdx) {
 
     let downEl = document.createElement('button')
     downEl.innerText = "⬇";
+    if (taskIdx === tasks.length - 1 || taskIdx === importitems - 1) {
+        downEl.disabled = true;
+    }
     downEl.onclick = () => {
+        let t = tasks[taskIdx];
+        tasks[taskIdx] = tasks[taskIdx + 1];
+        tasks[taskIdx + 1] = t;
+        renderTaskItems();
 
     }
     ctrlbarEl.append(downEl)
@@ -98,8 +144,12 @@ function renderTaskCtrlbar(tasks, taskIdx) {
     let cancelEl = document.createElement('button')
     cancelEl.innerText = "×";
     cancelEl.onclick = () => {
-        tasks.splice(taskIdx, 1);
-        renderTaskItems()
+        let flag = confirm(`您确定删除'${task.title}'这个待办项吗`);
+        if (flag) {
+            tasks.splice(taskIdx, 1);
+            renderTaskItems();
+        }
+
     }
 
     ctrlbarEl.append(cancelEl)
@@ -107,4 +157,3 @@ function renderTaskCtrlbar(tasks, taskIdx) {
     return ctrlbarEl;
 }
 renderEditor()
-renderTaskItems()
