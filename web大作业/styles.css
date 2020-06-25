@@ -62,3 +62,27 @@ body {
 .task.done>label {
     text-decoration: line-through;
 }
+
+.todo-items .ctrlbar>input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.5em;
+    height: 1.5em;
+    background: url(三角形.jpg);
+    background-size: 20px;
+    margin-left: 18px;
+}
+
+.task.import .ctrlbar>input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 1.5em;
+    height: 1.5em;
+    background: url(黄色三角形.jpg);
+    margin-left: 18px;
+    background-size: 20px;
+}
+
+.task.import>label {
+    color: lightpink;
+}
